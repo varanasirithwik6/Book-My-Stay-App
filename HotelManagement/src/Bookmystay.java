@@ -17,12 +17,16 @@ abstract class Room {
         System.out.println("Size: " + size + " sqft");
         System.out.println("Price per night: " + price);
     }
+
 }
 
 class SingleRoom extends Room {
+
+
     public SingleRoom() {
         super(1, 250, 1500.0);
     }
+
 }
 
 class DoubleRoom extends Room {
