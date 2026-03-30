@@ -41,7 +41,6 @@ class BookingRequestQueue {
  * * Use Case 5: Booking Request (First-Come-First-Served)
  */
 public class Bookmystay {
-
     public static void main(String[] args) {
         // Display application header
         System.out.println("Booking Request Queue");
