@@ -1,9 +1,13 @@
-import java.util.HashMap;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Scanner;
 
 class RoomInventory {
-    private Map<String, Integer> inventory = new HashMap<>();
+    private Map<String, Integer> inventory = new LinkedHashMap<>();
 
     public RoomInventory() {
         inventory.put("Single", 5);
@@ -11,45 +15,71 @@ class RoomInventory {
         inventory.put("Suite", 2);
     }
 
-    public void restoreRoom(String roomType) {
-        inventory.put(roomType, inventory.getOrDefault(roomType, 0) + 1);
+    public void setInventory(String roomType, int count) {
+        inventory.put(roomType, count);
     }
 
-    public int getAvailability(String roomType) {
-        return inventory.getOrDefault(roomType, 0);
+    public Map<String, Integer> getInventoryMap() {
+        return inventory;
+    }
+
+    public void displayInventory() {
+        System.out.println("\nCurrent Inventory:");
+        System.out.println("Single: " + inventory.get("Single"));
+        System.out.println("Double: " + inventory.get("Double"));
+        System.out.println("Suite: " + inventory.get("Suite"));
     }
 }
 
-class CancellationService {
-    private Stack<String> rollbackHistory = new Stack<>();
-
-    public void cancelBooking(String reservationId, String roomType, RoomInventory inventory) {
-        inventory.restoreRoom(roomType);
-
-        String historyRecord = "Released Reservation ID: " + reservationId +
-                "\nUpdated " + roomType + " Room Availability: " + inventory.getAvailability(roomType);
-        rollbackHistory.push(historyRecord);
-
-        System.out.println("Booking cancelled successfully. Inventory restored for room type: " + roomType);
+class FilePersistenceService {
+    public void saveInventory(RoomInventory inventory, String filePath) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            for (Map.Entry<String, Integer> entry : inventory.getInventoryMap().entrySet()) {
+                writer.write(entry.getKey() + "-" + entry.getValue() + "\n");
+            }
+            System.out.println("\nInventory saved successfully.");
+        } catch (IOException e) {
+            System.out.println("\nError saving inventory.");
+        }
     }
 
-    public void showRollbackHistory() {
-        System.out.println("\nRollback History (Most Recent First):");
-        while (!rollbackHistory.isEmpty()) {
-            System.out.println(rollbackHistory.pop());
+    public void loadInventory(RoomInventory inventory, String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("No valid inventory data found. Starting fresh.");
+            return;
+        }
+
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split("-");
+                if (parts.length == 2) {
+                    inventory.setInventory(parts[0], Integer.parseInt(parts[1]));
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("No valid inventory data found. Starting fresh.");
         }
     }
 }
 
 public class Bookmystay {
     public static void main(String[] args) {
-        System.out.println("Booking Cancellation");
+        System.out.println("System Recovery\n");
+
+        String filePath = "inventory_state.txt";
+
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
 
         RoomInventory inventory = new RoomInventory();
-        CancellationService cancellationService = new CancellationService();
+        FilePersistenceService persistenceService = new FilePersistenceService();
 
-        cancellationService.cancelBooking("Single-1", "Single", inventory);
-
-        cancellationService.showRollbackHistory();
+        persistenceService.loadInventory(inventory, filePath);
+        inventory.displayInventory();
+        persistenceService.saveInventory(inventory, filePath);
     }
 }
