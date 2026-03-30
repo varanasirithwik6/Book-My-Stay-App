@@ -1,70 +1,69 @@
+import java.util.HashMap;
+import java.util.Map;
+
 abstract class Room {
+    private int beds;
+    private int size;
+    private double price;
 
-    protected int numberOfBeds;
-    protected int squareFeet;
-    protected double pricePerNight;
-
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+    public Room(int beds, int size, double price) {
+        this.beds = beds;
+        this.size = size;
+        this.price = price;
     }
 
-    public void displayRoomDetails() {
-        System.out.println("Beds: " + numberOfBeds);
-        System.out.println("Size: " + squareFeet + " sqft");
-        System.out.println("Price per night: " + pricePerNight);
+    public void displayInfo() {
+        System.out.println("Beds: " + beds);
+        System.out.println("Size: " + size + " sqft");
+        System.out.println("Price per night: " + price);
     }
 }
 
-// Single Room
 class SingleRoom extends Room {
     public SingleRoom() {
         super(1, 250, 1500.0);
     }
 }
 
-// Double Room
 class DoubleRoom extends Room {
     public DoubleRoom() {
         super(2, 400, 2500.0);
     }
 }
 
-// Suite Room
 class SuiteRoom extends Room {
     public SuiteRoom() {
         super(3, 750, 5000.0);
     }
 }
 
-// Main Class
-public class Bookmystay {
-
+public class Bookmystay{
     public static void main(String[] args) {
+        // Initialize Inventory (System State)
+        Map<String, Integer> availability = new HashMap<>();
+        availability.put("Single", 5);
+        availability.put("Double", 3);
+        availability.put("Suite", 2);
 
-        System.out.println("Hotel Room Initialization\n");
+        System.out.println("--- Room Search Results ---\n");
 
-        Room singleRoom = new SingleRoom();
-        Room doubleRoom = new DoubleRoom();
-        Room suiteRoom = new SuiteRoom();
+        // Logic to check and display availability without modifying the map
+        if (availability.get("Single") > 0) {
+            System.out.println("Single Room:");
+            new SingleRoom().displayInfo();
+            System.out.println("Available: " + availability.get("Single"));
+        }
 
-        int singleAvailable = 5;
-        int doubleAvailable = 3;
-        int suiteAvailable = 2;
+        if (availability.get("Double") > 0) {
+            System.out.println("\nDouble Room:");
+            new DoubleRoom().displayInfo();
+            System.out.println("Available: " + availability.get("Double"));
+        }
 
-        System.out.println("Single Room:");
-        singleRoom.displayRoomDetails();
-        System.out.println("Available: " + singleAvailable);
-        System.out.println();
-
-        System.out.println("Double Room:");
-        doubleRoom.displayRoomDetails();
-        System.out.println("Available: " + doubleAvailable);
-        System.out.println();
-
-        System.out.println("Suite Room:");
-        suiteRoom.displayRoomDetails();
-        System.out.println("Available: " + suiteAvailable);
+        if (availability.get("Suite") > 0) {
+            System.out.println("\nSuite Room:");
+            new SuiteRoom().displayInfo();
+            System.out.println("Available: " + availability.get("Suite"));
+        }
     }
 }
