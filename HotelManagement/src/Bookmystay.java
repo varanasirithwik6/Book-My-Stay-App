@@ -1,7 +1,9 @@
 import java.util.LinkedList;
 import java.util.Queue;
 
-// Model representing a guest's reservation intent
+/**
+ * Model representing a guest's reservation intent.
+ */
 class Reservation {
     private String guestName;
     private String roomType;
@@ -15,7 +17,9 @@ class Reservation {
     public String getRoomType() { return roomType; }
 }
 
-// Manager for the FIFO queue
+/**
+ * Manager for the FIFO queue.
+ */
 class BookingRequestQueue {
     private Queue<Reservation> queue = new LinkedList<>();
 
@@ -32,9 +36,15 @@ class BookingRequestQueue {
     }
 }
 
+/**
+ * MAIN CLASS UseCase5BookingRequestQueue
+ * * Use Case 5: Booking Request (First-Come-First-Served)
+ */
 public class Bookmystay {
     public static void main(String[] args) {
-        System.out.println("Booking Request Queue\n");
+        // Display application header
+        System.out.println("Booking Request Queue");
+        System.out.println("---------------------------");
 
         // Initialize booking queue
         BookingRequestQueue bookingQueue = new BookingRequestQueue();
@@ -44,19 +54,20 @@ public class Bookmystay {
         Reservation r2 = new Reservation("Subha", "Double");
         Reservation r3 = new Reservation("Vanmathi", "Suite");
 
-        // Add requests to the queue (FIFO - First In, First Out)
+        // Add requests to the queue (FIFO)
         bookingQueue.addRequest(r1);
         bookingQueue.addRequest(r2);
         bookingQueue.addRequest(r3);
 
-        // Display queued booking requests in the order they arrived
-        int position = 1;
+        // Display queued booking requests in FIFO order
+        int count = 1;
         while (bookingQueue.hasPendingRequests()) {
             Reservation current = bookingQueue.processNextRequest();
-            System.out.println("Processing Request #" + (position++) + ":");
+            System.out.println("Processing Request #" + count);
             System.out.println("Guest: " + current.getGuestName());
             System.out.println("Room Type: " + current.getRoomType());
             System.out.println("---------------------------");
+            count++;
         }
     }
 }
