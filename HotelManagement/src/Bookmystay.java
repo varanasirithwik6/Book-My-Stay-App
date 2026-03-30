@@ -1,66 +1,82 @@
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Scanner;
 
-// Model representing an individual optional offering
-class Service {
-    private String name;
-    private double price;
-
-    public Service(String name, double price) {
-        this.name = name;
-        this.price = price;
+/**
+ * Custom Exception for domain-specific validation errors.
+ */
+class InvalidBookingException extends Exception {
+    public InvalidBookingException(String message) {
+        super(message);
     }
-
-    public String getName() { return name; }
-    public double getPrice() { return price; }
 }
 
-// Manages the association between reservations and selected services
-class AddOnServiceManager {
-    private Map<String, List<Service>> selections = new HashMap<>();
+/**
+ * Validates booking requests before processing.
+ */
+class ReservationValidator {
+    // Note: Case-sensitive as required by the use case
+    private final List<String> validRooms = Arrays.asList("Single", "Double", "Suite");
 
-    public void addService(String reservationId, Service service) {
-        selections.computeIfAbsent(reservationId, k -> new ArrayList<>()).add(service);
-    }
-
-    public void displaySelectedServices(String reservationId) {
-        List<Service> services = selections.get(reservationId);
-        if (services != null) {
-            double total = 0;
-            for (Service s : services) {
-                System.out.println("- " + s.getName() + " ($" + s.getPrice() + ")");
-                total += s.getPrice();
-            }
-            System.out.println("Total Add-On Cost: $" + total);
+    public void validate(String guestName, String roomType) throws InvalidBookingException {
+        if (guestName == null || guestName.trim().isEmpty()) {
+            throw new InvalidBookingException("Guest name cannot be empty.");
+        }
+        if (!validRooms.contains(roomType)) {
+            throw new InvalidBookingException("Invalid room type selected.");
         }
     }
 }
 
-public class Bookmystay{
+/**
+ * Component to manage room inventory (Stub for this use case).
+ */
+class RoomInventory {
+    public RoomInventory() {}
+}
+
+/**
+ * Component to manage booking queue (Stub for this use case).
+ */
+class BookingRequestQueue {
+    public BookingRequestQueue() {}
+}
+
+/**
+ * MAIN CLASS UseCase9ErrorHandlingValidation
+ * Use Case 9: Error Handling & Validation
+ */
+public class Bookmystay {
+
     public static void main(String[] args) {
-        System.out.println("Add-On Service Selection");
-        System.out.println("---------------------------");
+        // Display application header
+        System.out.println("Booking Validation");
 
-        AddOnServiceManager manager = new AddOnServiceManager();
+        Scanner scanner = new Scanner(System.in);
 
-        // Define available services
-        Service wifi = new Service("High-Speed WiFi", 15.0);
-        Service breakfast = new Service("Buffet Breakfast", 25.0);
-        Service spa = new Service("Spa Treatment", 100.0);
+        // Initialize required components
+        RoomInventory inventory = new RoomInventory();
+        ReservationValidator validator = new ReservationValidator();
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        // Simulation for a specific Reservation ID (e.g., from Use Case 6)
-        String resId = "Single-1";
-        System.out.println("Guest Reservation ID: " + resId);
+        try {
+            System.out.print("Enter guest name: ");
+            String guestName = scanner.nextLine();
 
-        // Guest selects services
-        manager.addService(resId, wifi);
-        manager.addService(resId, breakfast);
+            System.out.print("Enter room type (Single/Double/Suite): ");
+            String roomType = scanner.nextLine();
 
-        // Display results
-        System.out.println("Selected Add-Ons:");
-        manager.displaySelectedServices(resId);
-        System.out.println("---------------------------");
+            // Validate user input
+            validator.validate(guestName, roomType);
+
+            System.out.println("Booking successfully validated and queued!");
+
+        } catch (InvalidBookingException e) {
+            // Handle domain-specific validation errors
+            System.out.println("Booking failed: " + e.getMessage());
+        } finally {
+            // Ensure the scanner is closed to prevent resource leaks
+            scanner.close();
+        }
     }
 }
